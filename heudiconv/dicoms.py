@@ -668,20 +668,23 @@ def embed_dicom_and_nifti_metadata(
         raise ValueError("Found multiple series")
     # may be odict now - iter to be safe
     stack = next(iter(stack))
+    meta_info_str = ''
+    if (len(dcmfiles) > 1):
+        if not os.path.exists(niftifile):
+            raise NotImplementedError(
+                "%s does not exist. "
+                "We are not producing new nifti files here any longer. "
+                "Use dcm2niix directly or .convert.nipype_convert helper ." % niftifile
+            )
 
-    if not os.path.exists(niftifile):
-        raise NotImplementedError(
-            "%s does not exist. "
-            "We are not producing new nifti files here any longer. "
-            "Use dcm2niix directly or .convert.nipype_convert helper ." % niftifile
-        )
-
-    orig_nii = nb.load(niftifile)
-    aff = orig_nii.affine  # type: ignore[attr-defined]
-    ornt = nb.orientations.io_orientation(aff)
-    axcodes = nb.orientations.ornt2axcodes(ornt)
-    new_nii = stack.to_nifti(voxel_order="".join(axcodes), embed_meta=True)
-    meta_info_str = ds.NiftiWrapper(new_nii).meta_ext.to_json()
+        orig_nii = nb.load(niftifile)
+        aff = orig_nii.affine  # type: ignore[attr-defined]
+        ornt = nb.orientations.io_orientation(aff)
+        axcodes = nb.orientations.ornt2axcodes(ornt)
+        new_nii = stack.to_nifti(voxel_order="".join(axcodes), embed_meta=True)
+        meta_info_str = ds.NiftiWrapper(new_nii).meta_ext.to_json()
+    else:
+        meta_info_str = stack._files_info[0][0].meta_ext.to_json()
     meta_info = json.loads(meta_info_str)
     assert isinstance(meta_info, dict)
 
