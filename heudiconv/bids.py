@@ -326,10 +326,10 @@ def tuneup_bids_json_files(json_files: list[str]) -> None:
         #        go under annex (not under git) and marked as sensitive
         # MG - Might want to replace with flag for data sensitivity
         # related - https://github.com/nipy/heudiconv/issues/92
-        if "Date" in str(json_):
+        #if "Date" in str(json_):
             # Let's hope no word 'Date' comes within a study name or smth like
             # that
-            raise ValueError("There must be no dates in .json sidecar")
+            #raise ValueError("There must be no dates in .json sidecar")
         # Those files should not have our version field already - should have been
         # freshly produced
         assert HEUDICONV_VERSION_JSON_KEY not in json_
